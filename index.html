@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fetch 2Assignment</title>
+    <style>
+        .main div{
+            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+            text-align: center;
+        }
+        .main{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 10px;
+        }
+        .main>div>img{
+            width: 200px;
+            height: 200px;
+        }
+        .head{
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="head">
+        <h2>Sort by Population</h2>
+    <select class="selectFirst" onchange="Sort()">
+        <option value="LTH">LTH</option>
+        <option value="HTL">HTL</option>
+    </select>
+
+    <h2>Search Bar</h2>
+    <input type="Enter regin here" oninput="seachFunction()">
+
+    <h2>Filter by Regin</h2>
+    <select class="selectSecond" onchange="filterRegion()">
+        <option value="Americas">Americas</option>
+        <option value="Asia">Asia</option>
+        <option value="Europe">Europe</option>
+        <option value="Oceania">Oceania</option>
+        <option value="Africa">Africa</option>
+        
+
+    </select>
+    </div>
+
+    <div class="main"></div>
+
+    
+</body>
+</html>
+
+<script>
+
+    let bag = []
+    let url = `https://restcountries.com/v3.1/all`
+    fetch(url)
+    .then((res)=>res.json())
+    .then((data)=> {
+        bag = data,
+        displayData(data)
+    })
+    .catch((err)=> console.log(err))
+
+    function displayData(data){
+        document.querySelector(".main").innerHTML = null
+        data.forEach((el)=>{
+            let div = document.createElement("div")
+            let img = document.createElement("img")
+            let name = document.createElement("h2")
+            let population = document.createElement("p")
+            let region = document.createElement("p")
+            let capital = document.createElement("p")
+
+            img.setAttribute("src", el.flags.png)
+            name.textContent = el.name.common
+            population.textContent = `Population: ${el.population}`
+            region.textContent = `Region: ${el.region}`
+            capital.textContent = `Capital: ${el.capital}`
+            // img.src = el.flags.png
+
+            div.append(img, name, population, region, capital)
+            document.querySelector(".main").append(div)
+        })
+        
+    }
+
+    // sorting part    
+    function Sort(){
+        let selectedValue = document.querySelector(".selectFirst").value
+        // console.log(selectedValue);
+        if(selectedValue == "LTH")
+        bag.sort((a,b)=> a.population-b.population)
+        if(selectedValue == "HTL")
+        bag.sort((a,b)=> b.population - a.population)
+        // console.log("bag", bag);
+        // console.log("selectedValue", selectedValue);
+        displayData(bag)
+    }
+
+    // searching part
+    function seachFunction(){
+        // console.log("filterWorking");
+        let val = document.querySelector("input").value 
+        // console.log("value", val);
+        let updatedValue = bag.filter((ele)=>{
+            return ele.name.common.toLocaleLowerCase().includes(val.toLocaleLowerCase())
+        })
+        displayData(updatedValue)
+        // console.log(updatedValue);
+    }
+
+    //filter by region 
+    function filterRegion(){
+        let regionFilter = document.querySelector(".selectSecond").value
+        console.log(regionFilter);
+        let newValue = bag.filter((element)=>{
+            return element.region == regionFilter
+        })
+        displayData(newValue)
+
+    }
+</script>
